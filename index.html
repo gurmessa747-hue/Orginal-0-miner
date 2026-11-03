@@ -5,29 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>Original(O)</title>
   <meta property="og:title" content="Original(O)" />
-  <meta property="og:description" content="Mine Original Token (O) directly in Telegram. Watch ads, boost your speed, and earn rewards." />
-  <meta property="og:image" content="https://ton.org/download/ton_symbol.png" />
-  <meta property="og:image:width" content="640" />
-  <meta property="og:image:height" content="360" />
-  <meta property="og:type" content="website" />
+  <meta property="og:description" content="Mine Original Token (O) directly in Telegram." />
+  <meta property="og:image" content="YOUR_IMAGE_URL" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstile" async defer></script>
-  <script src="//libtl.com/sdk.js" data-zone="12007112" data-sdk="show_12007112"></script>
   <style>
     :root { --bg:#05070a; --card:#0d1410; --line:#1c3a24; --text:#f4f7fb; --muted:#9aa6b5; --green:#2fce4a; --blue:#2f80ed; }
     * { box-sizing:border-box; }
     body { margin:0; font-family:system-ui,sans-serif; color:var(--text); background:radial-gradient(circle at 50% 22%, rgba(47,206,74,.26), transparent 26%), radial-gradient(circle at 12% 78%, rgba(20,90,40,.32), transparent 30%), linear-gradient(180deg, #070b09 0%, #05070a 46%, #07140c 100%); background-attachment:fixed; }
     body:before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.45; background:repeating-linear-gradient(115deg, transparent 0 18px, rgba(47,206,74,.07) 18px 19px), repeating-linear-gradient(65deg, transparent 0 28px, rgba(180,255,120,.05) 28px 29px), radial-gradient(rgba(47,206,74,.28) 1px, transparent 1.4px); background-size:auto, auto, 18px 18px; }
     @keyframes floaty { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
-    @keyframes pulse { 0%,100% { box-shadow:0 0 24px rgba(47,206,74,.28), inset 0 0 0 12px #071208; } 50% { box-shadow:0 0 54px rgba(47,206,74,.7), inset 0 0 0 12px #071208; } }
+    @keyframes pulse { 0%,100% { box-shadow:0 0 24px rgba(47,206,74,.28); } 50% { box-shadow:0 0 54px rgba(47,206,74,.7); } }
     @keyframes glowtext { 0%,100% { text-shadow:0 0 10px rgba(47,206,74,.25); } 50% { text-shadow:0 0 22px rgba(125,255,138,.85); } }
     @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.35; } }
     @keyframes rise { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
     @keyframes shine { from { background-position:0 0; } to { background-position:40px 0; } }
-    #gate { position:fixed; inset:0; z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:28px; text-align:center; background:radial-gradient(circle at 50% 28%, #24315f, #12083a 55%); }
+    #gate { position:fixed; inset:0; z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:28px; text-align:center; background:#000; }
     #gate.hide { display:none; }
-    .gate-logo { width:150px; height:150px; filter:drop-shadow(0 0 18px rgba(47,206,74,.55)); border-radius:50%; }
+    .gate-logo { width:160px; height:160px; border-radius:50%; object-fit:cover; filter:drop-shadow(0 0 20px #2fce4a); }
     #gate h1 { margin:8px 0 0; color:#2fce4a; font-size:36px; }
     #gate-status, .gate-note, .gate-hint { color:#d5d8e0; max-width:320px; line-height:1.4; margin:0; }
     .gate-hint { font-size:16px; color:#f4f7fb; }
@@ -35,16 +31,15 @@
     .app { position:relative; max-width:430px; margin:0 auto; min-height:100vh; padding:14px 14px 108px; }
     .page { display:none; } .page.on { display:block; animation:rise .35s ease; } h1 { font-size:28px; margin:4px 0; }
     .label, .note, .addr { color:var(--muted); } .green { color:var(--green); font-weight:700; }
-    button.btn, button.buy, button.watch, button.go, button.claim, button.action, button.ad, button.range, button.pill { border:0; background:var(--green); color:#06210c; font-weight:800; border-radius:12px; }
-    button.btn, button.buy, button.watch, button.go, button.action, button.ad { width:100%; padding:12px; }
+    button.btn, button.buy, button.watch, button.go, button.claim, button.action, button.range, button.pill { border:0; background:var(--green); color:#06210c; font-weight:800; border-radius:12px; }
+    button.btn, button.buy, button.watch, button.go, button.action { width:100%; padding:12px; }
     button.claim { width:100%; margin-top:8px; padding:20px 16px; font-size:22px; letter-spacing:1px; border-radius:18px; animation:pulse 2.4s ease-in-out infinite; }
-    button.ad, button.buy { margin-top:10px; } button.pill { width:auto; border-radius:999px; padding:10px 16px; }
+    button.buy { margin-top:10px; } button.pill { width:auto; border-radius:999px; padding:10px 16px; }
     button.go.done, button.watch:disabled, button.buy.reached, button.pill:disabled { background:#1e3a28; color:#9ed7ae; animation:none; }
     button.buy.active, button.buy.price { background:#2fce4a; color:#06210c; }
     button.wallet { background:var(--blue); color:#fff; animation:none; }
     button.wallet.connected { background:#1d4ed8; color:#fff; }
-    .card, .top, .adcard { background:rgba(10,16,12,.86); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:12px; }
-    .adcard { background:linear-gradient(180deg,#132016,#0c140f); }
+    .card, .top { background:rgba(10,16,12,.86); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:12px; }
     .row, .user, .bank, .frow { display:flex; gap:10px; align-items:center; justify-content:space-between; }
     .ico-box, .avatar { width:42px; height:42px; border-radius:12px; background:#10161c; display:flex; align-items:center; justify-content:center; font-size:20px; }
     .avatar { background:var(--green); color:#06210c; font-weight:800; }
@@ -55,9 +50,7 @@
     .wallet-wrap, .claim-num { text-align:center; }
     .claim-num { font-size:34px; font-weight:800; color:#7dff8a; animation:glowtext 1.8s ease-in-out infinite; }
     .stage { height:230px; display:flex; align-items:center; justify-content:center; }
-    .mark { width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 50% 42%, #d8ff9a, #39e023 42%, #0b8f12); position:relative; animation:floaty 3.2s ease-in-out infinite, pulse 2.4s ease-in-out infinite; }
-    .mark:before, .mark:after, .mark span { content:""; position:absolute; background:#111; border-radius:40px; }
-    .mark:before { width:44px; height:74px; left:68px; top:36px; } .mark:after { width:32px; height:58px; left:40px; top:58px; transform:rotate(-28deg); } .mark span { width:32px; height:58px; right:40px; top:58px; transform:rotate(28deg); }
+    .mark { width:180px; height:180px; border-radius:50%; object-fit:cover; animation:floaty 3.2s ease-in-out infinite, pulse 2.4s ease-in-out infinite; }
     #live { animation:blink 1.4s ease-in-out infinite; }
     .ranges { display:flex; gap:8px; background:#121820; border-radius:14px; padding:6px; margin:10px 0; }
     button.range { flex:1; background:transparent; color:var(--muted); padding:8px; } button.range.on { background:#243044; color:#fff; }
@@ -85,22 +78,7 @@
 </head>
 <body>
   <div id="gate">
-    <svg class="gate-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="leaf" cx="50%" cy="40%" r="62%">
-          <stop offset="0%" stop-color="#d4ff7a"/>
-          <stop offset="40%" stop-color="#3ee026"/>
-          <stop offset="100%" stop-color="#0a7f12"/>
-        </radialGradient>
-      </defs>
-      <circle cx="100" cy="100" r="96" fill="#061008"/>
-      <circle cx="100" cy="100" r="82" fill="none" stroke="#2fce4a" stroke-width="7"/>
-      <circle cx="100" cy="100" r="72" fill="url(#leaf)"/>
-      <path fill="#050a08" d="M100 36c11 22 19 36 19 54 0 13-8 22-19 22s-19-9-19-22c0-18 8-32 19-54z"/>
-      <path fill="#050a08" d="M100 80c28-6 46 10 52 30 5 15-3 28-17 30-19 3-29-12-35-28-6 16-16 31-35 28-14-2-22-15-17-30 6-20 24-36 52-30z"/>
-      <path fill="#050a08" d="M100 100c19 10 32 34 32 56 0 10-9 17-18 17-12 0-17-9-15-21 2-16-2-27 1-52z"/>
-      <path fill="#050a08" d="M100 100c-19 10-32 34-32 56 0 10 9 17 18 17 12 0 17-9 15-21-2-16 2-27-1-52z"/>
-    </svg>
+    <img class="gate-logo" src="YOUR_IMAGE_URL" alt="Original">
     <h1>Original(O)</h1>
     <p id="gate-status">Checking your connection is secure...</p>
     <div id="turnstile-box"></div>
@@ -109,74 +87,61 @@
   </div>
   <div class="app">
     <section id="home" class="page on">
-      <div class="top"><div><div class="label" data-i18n="mining_rate">MINING RATE</div><div id="hashrate">0.50 TH/s</div></div><div><div class="label" data-i18n="current_rank">CURRENT RANK</div><div id="rank">Level 1</div></div><div class="bank"><span id="status">Mining</span><div class="track"><div class="fill" id="bank-fill"></div></div><span id="live">live</span></div></div>
-      <div class="wallet-wrap"><b id="held">0.00000000 O</b><div class="note" data-i18n="claimed_in_app">Claimed in app</div></div>
-      <div class="stage"><div class="mark"><span></span></div></div>
+      <div class="top"><div><div class="label">MINING RATE</div><div id="hashrate">0.50 TH/s</div></div><div><div class="label">CURRENT RANK</div><div id="rank">Level 1</div></div><div class="bank"><span id="status">Mining</span><div class="track"><div class="fill" id="bank-fill"></div></div><span id="live">live</span></div></div>
+      <div class="wallet-wrap"><b id="held">0.00000000 O</b><div class="note">Claimed in app</div></div>
+      <div class="stage"><img class="mark" src="YOUR_IMAGE_URL" alt="Mining"></div>
       <div class="claim-num" id="reward">+0.00000000</div>
-      <button class="claim" id="claim" data-i18n="claim">Claim</button>
-      <button class="ad" id="ad" data-i18n="watch_ad_boost">Watch ad to boost +1 TH/s (2h)</button>
+      <button class="claim" id="claim">Claim</button>
       <div class="buy-row"><button class="buy-ext buy-ston" id="buy-ston">Buy on STON.fi</button><button class="buy-ext buy-dedust" id="buy-dedust">Buy on DeDust</button></div>
-      <p class="buy-note" data-i18n="buy_note">You can also buy and sell $O through Keeper (formerly Tonkeeper). Just search for “O” or “Original Token” in the Keeper wallet.</p>
+      <p class="buy-note">You can also buy and sell $O through Keeper. Search for “O” or “Original Token”.</p>
     </section>
+
     <section id="tasks" class="page">
-      <div class="label">ORIGINAL(O)</div><h1 data-i18n="lum_tasks">Original Tasks</h1><p class="note" data-i18n="tasks_note">Complete tasks and watch ads to earn O</p>
-      <div class="adcard"><div class="frow"><div class="ico-box">📺</div><div class="grow"><b data-i18n="watch_ads">Watch Ads</b><div class="green" id="ad-line">+15 O per ad · 0/10 today</div></div></div><div class="bar" style="margin:12px 0"><i id="ad-bar"></i></div><div class="note" id="ad-left2">10 left today</div><button class="watch" id="watch">▶ Watch Ad (+15 O)</button><div id="task-msg"></div></div>
+      <div class="label">ORIGINAL(O)</div><h1>Original Tasks</h1><p class="note">Complete tasks to earn O</p>
       <div class="card"><div class="row"><b>Join Original Community</b><span class="green">+50 O</span></div><div class="note">Step 1: join the channel. Step 2: come back and claim.</div><button class="go" data-task="community" data-url="https://t.me/originaltokencommunity" data-reward="50">1) JOIN CHANNEL</button></div>
       <div class="card"><div class="row"><b>Join Original Payouts</b><span class="green">+50 O</span></div><div class="note">Step 1: join the channel. Step 2: come back and claim.</div><button class="go" data-task="payouts" data-url="https://t.me/originalpayouts" data-reward="50">1) JOIN CHANNEL</button></div>
       <div class="card"><div class="row"><b>Join Gram Apps</b><span class="green">+30 O</span></div><div class="note">Step 1: join the channel. Step 2: come back and claim.</div><button class="go" data-task="gramapps" data-url="https://t.me/gramminiappsmining" data-reward="30">1) JOIN CHANNEL</button></div>
       <div class="card"><div class="row"><b>Join Gram Money</b><span class="green">+30 O</span></div><div class="note">Step 1: join the channel. Step 2: come back and claim.</div><button class="go" data-task="grammoney" data-url="https://t.me/Grammoneywallet" data-reward="30">1) JOIN CHANNEL</button></div>
-      <div class="card"><div class="row"><b>Subscribe Original YouTube</b><span class="green">+40 O</span></div><div class="note">Step 1: subscribe to the channel. Step 2: come back and claim.</div><button class="go" data-task="youtube" data-url="https://www.youtube.com/@originaltoken" data-reward="40">1) SUBSCRIBE</button></div>
     </section>
+
     <section id="boost" class="page">
-      <h1 data-i18n="boost_title">Boost Mining Speed</h1><p class="note" data-i18n="boost_note">Level follows claimed O plus on-chain holding. Level 100 is 5,000,000 O.</p>
+      <h1>Boost Mining Speed</h1><p class="note">Level follows claimed O plus on-chain holding. Level 100 is 5,000,000 O.</p>
       <div class="row"><h1 id="boost-level" style="margin:0">Level 1</h1><span class="badge">All-time High</span></div>
       <div class="green" id="pnl">Today's PNL +0.00 O</div>
       <div class="ranges"><button class="range" data-range="24h">24h</button><button class="range on" data-range="7d">7d</button><button class="range" data-range="30d">30d</button><button class="range" data-range="all">All</button></div>
       <svg class="chart" id="chart" viewBox="0 0 320 140"></svg>
-      <h1 style="font-size:20px" data-i18n="upgrade_packs">Mining Speed Upgrade Packs</h1>
+      <h1 style="font-size:20px">Mining Speed Upgrade Packs</h1>
       <div class="row"><button class="btn" id="prev">Prev</button><span id="page-label"></span><button class="btn" id="next">Next</button></div>
       <div class="grid" id="packs"></div>
     </section>
+
     <section id="friends" class="page">
-      <div class="label">ORIGINAL(O)</div><h1 data-i18n="friends">Friends</h1>
-      <p class="note" data-i18n="friends_note">Invite friends to boost mining speed! Qualified only after wallet connect.</p>
-      <div class="card frow"><div class="ico-box">🔗</div><div class="grow"><b data-i18n="invite_link">Your Invite Link</b><div class="addr" id="invite-link"></div></div><button class="pill" id="invite" data-i18n="copy">Copy</button></div>
-      <div class="card frow"><div class="ico-box">👥</div><div class="grow"><b data-i18n="your_referrals">Your Referrals</b><div class="note" id="ref-count">0 qualified · 0 total</div></div></div>
-      <div class="card frow"><div class="ico-box">🎁</div><div class="grow"><b data-i18n="referral_reward">Referral Reward</b><div class="note" id="ref-available">0 available · +1000 O each</div></div><button class="pill" id="claim-ref">Claim</button></div>
-      <div class="card frow"><div class="ico-box">🎁</div><div class="grow"><b data-i18n="team_wallet">Team Wallet</b><div class="note" id="team-wallet">0 O from your network</div></div><button class="pill" id="share" data-i18n="share">Share</button></div>
-      <p class="note" style="text-align:center" data-i18n="latest_friends">Latest invited friends</p>
+      <div class="label">ORIGINAL(O)</div><h1>Friends</h1>
+      <p class="note">Invite friends to boost mining speed! Qualified only after wallet connect.</p>
+      <div class="card frow"><div class="ico-box">🔗</div><div class="grow"><b>Your Invite Link</b><div class="addr" id="invite-link"></div></div><button class="pill" id="invite">Copy</button></div>
+      <div class="card frow"><div class="ico-box">👥</div><div class="grow"><b>Your Referrals</b><div class="note" id="ref-count">0 qualified · 0 total</div></div></div>
+      <div class="card frow"><div class="ico-box">🎁</div><div class="grow"><b>Referral Reward</b><div class="note" id="ref-available">0 available · +1000 O each</div></div><button class="pill" id="claim-ref">Claim</button></div>
+      <div class="card frow"><div class="ico-box">🎁</div><div class="grow"><b>Team Wallet</b><div class="note" id="team-wallet">0 O from your network</div></div><button class="pill" id="share">Share</button></div>
+      <p class="note" style="text-align:center">Latest invited friends</p>
       <div id="friend-list"></div>
     </section>
+
     <section id="profile" class="page">
-      <h1 data-i18n="profile">Profile</h1>
+      <h1>Profile</h1>
       <div class="card user"><div class="avatar" id="avatar">O</div><div class="grow"><b id="uname">Miner</b><div class="note" id="handle"></div><div class="note" id="tgid"></div></div></div>
       <div id="ton-connect"></div>
-      <div class="card"><div class="row"><b data-i18n="holding_wallet">Holding Wallet</b><b id="bal">0.0000 O</b></div><div class="note" data-i18n="onchain">On-chain O</div></div>
-      <div class="card"><div class="row"><b data-i18n="mining_wallet">Mining Wallet</b><b id="mined">0 O</b></div></div>
-      <div class="card"><b data-i18n="withdraw">Withdraw O</b><input id="wamount" type="number" min="10000" placeholder="Minimum 10000" /><div class="note" id="min-note">Minimum 10,000 O. Fee 1,000 O.</div><button class="btn" id="do-withdraw" data-i18n="request_withdrawal">Request withdrawal</button><div id="wmsg"></div></div>
-      <div class="card"><b data-i18n="withdrawal_history">Withdrawal History</b><div id="whist" class="note">No requests yet</div></div>
-      <div class="card"><b data-i18n="language">Language</b>
-        <select id="lang">
-          <option value="en">English</option>
-          <option value="zh">中文 (Chinese)</option>
-          <option value="hi">हिन्दी (Hindi)</option>
-          <option value="es">Español (Spanish)</option>
-          <option value="ar">العربية (Arabic)</option>
-          <option value="fr">Français (French)</option>
-          <option value="ru">Русский (Russian)</option>
-          <option value="pt">Português (Portuguese)</option>
-          <option value="id">Indonesia</option>
-          <option value="bn">বাংলা (Bengali)</option>
-        </select>
-      </div>
+      <div class="card"><div class="row"><b>Holding Wallet</b><b id="bal">0.0000 O</b></div><div class="note">On-chain O</div></div>
+      <div class="card"><div class="row"><b>Mining Wallet</b><b id="mined">0 O</b></div></div>
+      <div class="card"><b>Withdraw O</b><input id="wamount" type="number" min="10000" placeholder="Minimum 10000" /><div class="note">Minimum 10,000 O. Fee 1,000 O.</div><button class="btn" id="do-withdraw">Request withdrawal</button><div id="wmsg"></div></div>
+      <div class="card"><b>Withdrawal History</b><div id="whist" class="note">No requests yet</div></div>
     </section>
   </div>
   <nav class="nav">
-    <button class="on" data-page="home"><span class="ico">⛏️</span><span data-i18n="mine">Mine</span></button>
-    <button data-page="tasks"><span class="ico">📋</span><span data-i18n="tasks">Tasks</span></button>
-    <button data-page="boost"><span class="ico">⚡</span><span data-i18n="boost">Boost</span></button>
-    <button data-page="friends"><span class="ico">👥</span><span data-i18n="friends">Friends</span></button>
-    <button data-page="profile"><span class="ico">👤</span><span data-i18n="profile">Profile</span></button>
+    <button class="on" data-page="home"><span class="ico">⛏️</span><span>Mine</span></button>
+    <button data-page="tasks"><span class="ico">📋</span><span>Tasks</span></button>
+    <button data-page="boost"><span class="ico">⚡</span><span>Boost</span></button>
+    <button data-page="friends"><span class="ico">👥</span><span>Friends</span></button>
+    <button data-page="profile"><span class="ico">👤</span><span>Profile</span></button>
   </nav>
   <script>
     const TURNSTILE_SITE_KEY = "0x4AAAAAAFRNMemz-cb8hOgy";
@@ -185,57 +150,26 @@
     const DEDUST_URL = "https://dedust.io/swap/TON/" + JETTON;
     const MAX = 100, PAGE = 20, CYCLE = 6 * 60 * 60 * 1000, KEY = "original-o-v1", FEE = 1000, MINW = 10000, TOP = 5000000;
     const RATIO = Math.pow(TOP / 40, 1 / 99);
-    let o = 0, address = "", ads = 0, level = 1, page = 0, refs = 0, adUntil = 0, bonus = 0, claimed = 0, startedAt = Date.now(), history = [], doneTasks = [], friends = [], samples = [], myId = "", walletBtn = null, joined = false, range = "7d", manualPage = false, currentLang = "en", adsResetAt = 0;
+    let o = 0, address = "", level = 1, page = 0, refs = 0, bonus = 0, claimed = 0, startedAt = Date.now(), history = [], doneTasks = [], friends = [], samples = [], myId = "", walletBtn = null, joined = false, range = "7d", manualPage = false;
     const $ = (id) => document.getElementById(id);
     const initData = () => (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) || "";
     const inviteUrl = () => "https://t.me/originaltokenminerbot/app?startapp=" + myId;
-
-    const i18n = {
-      en: { mining_rate:"MINING RATE", current_rank:"CURRENT RANK", claimed_in_app:"Claimed in app", claim:"Claim", watch_ad_boost:"Watch ad to boost +1 TH/s (2h)", buy_note:"You can also buy and sell $O through Keeper (formerly Tonkeeper). Just search for “O” or “Original Token” in the Keeper wallet.", lum_tasks:"Original Tasks", tasks_note:"Complete tasks and watch ads to earn O", watch_ads:"Watch Ads", boost_title:"Boost Mining Speed", boost_note:"Level follows claimed O plus on-chain holding. Level 100 is 5,000,000 O.", upgrade_packs:"Mining Speed Upgrade Packs", friends:"Friends", friends_note:"Invite friends to boost mining speed! Qualified only after wallet connect.", invite_link:"Your Invite Link", copy:"Copy", your_referrals:"Your Referrals", referral_reward:"Referral Reward", team_wallet:"Team Wallet", share:"Share", latest_friends:"Latest invited friends", profile:"Profile", holding_wallet:"Holding Wallet", onchain:"On-chain O", mining_wallet:"Mining Wallet", withdraw:"Withdraw O", request_withdrawal:"Request withdrawal", withdrawal_history:"Withdrawal History", language:"Language", mine:"Mine", tasks:"Tasks", boost:"Boost", waiting_wallet:"Waiting for wallet connection", qualified:"Qualified" },
-      // (other languages kept the same structure — update O texts as needed)
-      zh: { mining_rate:"挖矿速率", current_rank:"当前等级", claimed_in_app:"应用内已领取", claim:"领取", watch_ad_boost:"观看广告提升 +1 TH/s (2小时)", buy_note:"您也可以通过 Keeper 买卖 $O。", lum_tasks:"Original 任务", tasks_note:"完成任务并观看广告赚取 O", watch_ads:"观看广告", boost_title:"提升挖矿速度", boost_note:"等级基于已领取 O 加链上持有。", upgrade_packs:"挖矿速度升级包", friends:"好友", friends_note:"邀请好友提升挖矿速度！", invite_link:"您的邀请链接", copy:"复制", your_referrals:"您的推荐", referral_reward:"推荐奖励", team_wallet:"团队钱包", share:"分享", latest_friends:"最新邀请的好友", profile:"个人资料", holding_wallet:"持有钱包", onchain:"链上 O", mining_wallet:"挖矿钱包", withdraw:"提取 O", request_withdrawal:"请求提取", withdrawal_history:"提取历史", language:"语言", mine:"挖矿", tasks:"任务", boost:"加速", waiting_wallet:"等待钱包连接", qualified:"已合格" }
-      // Add the rest of the languages if you need full multi-language support
-    };
-
-    function applyLang(lang) {
-      currentLang = lang;
-      localStorage.setItem("original-lang", lang);
-      const t = i18n[lang] || i18n.en;
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.dataset.i18n;
-        if (t[key]) el.textContent = t[key];
-      });
-      paint();
-    }
-
-    function formatTime(ms) {
-      if (ms <= 0) return "00:00:00";
-      const total = Math.floor(ms / 1000);
-      const h = Math.floor(total / 3600);
-      const m = Math.floor((total % 3600) / 60);
-      const s = total % 60;
-      return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
-    }
 
     function load() {
       try {
         const s = JSON.parse(localStorage.getItem(KEY) || "{}");
         startedAt = s.startedAt || Date.now();
-        ads = s.ads || 0;
         bonus = s.bonus || 0;
         claimed = s.claimed || 0;
-        adUntil = s.adUntil || 0;
         history = s.history || [];
         doneTasks = s.doneTasks || [];
         joined = !!s.joined;
         samples = s.samples || [];
-        adsResetAt = s.adsResetAt || 0;
       } catch (e) {}
     }
     function save() {
-      localStorage.setItem(KEY, JSON.stringify({ startedAt, ads, bonus, claimed, adUntil, history, doneTasks, joined, samples, adsResetAt }));
+      localStorage.setItem(KEY, JSON.stringify({ startedAt, bonus, claimed, history, doneTasks, joined, samples }));
     }
-
     function rateOf(n) {
       n = Math.max(1, Math.min(100, Math.floor(n)));
       let rate;
@@ -246,8 +180,7 @@
       else rate = 11.50 + (n - 81) * 0.50;
       return Math.round(rate * 100) / 100;
     }
-
-    function rateNow() { return rateOf(level) + (Date.now() < adUntil ? 1 : 0); }
+    function rateNow() { return rateOf(level); }
     function elapsed() { return Math.max(0, Date.now() - startedAt); }
     function stopped() { return elapsed() >= CYCLE; }
     function minedNow() { return rateNow() * Math.min(elapsed(), CYCLE) / 3600000 * 8; }
@@ -268,12 +201,11 @@
       $("chart").innerHTML = "<polygon points='0,140 " + line + " 320,140' fill='rgba(47,206,74,.28)'/><polyline points='" + line + "' fill='none' stroke='#2fce4a' stroke-width='3'/>";
     }
     function renderFriends() {
-      const t = i18n[currentLang] || i18n.en;
       $("friend-list").innerHTML = friends.length ? "" : "<div class='card note'>No friends yet</div>";
       friends.forEach((f) => { 
         const el = document.createElement("div"); 
         el.className = "card friend frow"; 
-        el.innerHTML = "<div class='avatar'>🎁</div><div class='grow'><b>" + (f.name || "Miner") + "</b><div class='" + (f.qualified ? "green" : "note") + "'>" + (f.qualified ? "● " + t.qualified : "● " + t.waiting_wallet) + "</div></div><button class='pill'>" + (f.paid ? "Paid" : "O") + "</button>"; 
+        el.innerHTML = "<div class='avatar'>🎁</div><div class='grow'><b>" + (f.name || "Miner") + "</b><div class='" + (f.qualified ? "green" : "note") + "'>" + (f.qualified ? "● Qualified" : "● Waiting for wallet") + "</div></div><button class='pill'>" + (f.paid ? "Paid" : "O") + "</button>"; 
         $("friend-list").appendChild(el); 
       });
     }
@@ -285,7 +217,7 @@
         const next = levelFromBalance(claimed + bonus + o);
         if (next !== level) { level = next; if (!manualPage) page = Math.floor((level - 1) / PAGE); renderPacks(); }
         sample(); drawChart();
-        const off = stopped(), session = minedNow(), appBal = purse(), boosted = Date.now() < adUntil;
+        const off = stopped(), session = minedNow(), appBal = purse();
         $("hashrate").textContent = (off ? 0 : rateNow()).toFixed(2) + " TH/s";
         $("rank").textContent = "Level " + level;
         $("boost-level").textContent = "Level " + level;
@@ -297,43 +229,6 @@
         $("status").textContent = off ? "Stopped" : "Mining";
         $("bank-fill").style.width = Math.min(100, elapsed() / CYCLE * 100) + "%";
         $("claim").textContent = off ? "Claim and restart" : "Claim";
-
-        if (boosted) {
-          const left = adUntil - Date.now();
-          $("ad").textContent = "Boost active " + formatTime(left);
-          $("ad").disabled = true;
-        } else {
-          $("ad").textContent = "Watch ad to boost +1 TH/s (2h)";
-          $("ad").disabled = false;
-        }
-
-        if (ads >= 10 && !adsResetAt) {
-          adsResetAt = Date.now() + 20 * 60 * 60 * 1000;
-          save();
-        }
-
-        if (adsResetAt && Date.now() >= adsResetAt) {
-          ads = 0;
-          adsResetAt = 0;
-          save();
-        }
-
-        $("ad-line").textContent = "+15 O per ad · " + ads + "/10 today";
-        $("ad-left2").textContent = (10 - ads) + " left today";
-        $("ad-bar").style.width = (ads / 10 * 100) + "%";
-
-        if (ads >= 10 && adsResetAt) {
-          const left = adsResetAt - Date.now();
-          $("watch").disabled = true;
-          $("watch").textContent = "Next ads in " + formatTime(left);
-        } else if (ads >= 10) {
-          $("watch").disabled = true;
-          $("watch").textContent = "Daily ads finished";
-        } else {
-          $("watch").disabled = false;
-          $("watch").textContent = "▶ Watch Ad (+15 O)";
-        }
-
         $("invite-link").textContent = myId ? inviteUrl() : "Open inside Telegram";
         $("ref-count").textContent = friends.filter((f) => f.qualified).length + " qualified · " + friends.length + " total";
         $("ref-available").textContent = refs + " available · +1000 O each";
@@ -345,28 +240,12 @@
       } catch (e) {}
     }
     function openBuy(url) { try { if (window.Telegram && Telegram.WebApp && Telegram.WebApp.openLink) Telegram.WebApp.openLink(url); else window.open(url, "_blank"); } catch (e) { window.open(url, "_blank"); } }
-
-    function openMine() {
-      $("gate-status").textContent = "Verified. Opening the mine...";
-      setTimeout(() => { $("gate").classList.add("hide"); }, 300);
-    }
-
+    function openMine() { $("gate-status").textContent = "Verified. Opening the mine..."; setTimeout(() => { $("gate").classList.add("hide"); }, 300); }
     window.onloadTurnstile = function () {
-      if (!window.turnstile) {
-        $("gate-status").textContent = "Cloudflare script did not load. Continuing...";
-        setTimeout(openMine, 600);
-        return;
-      }
-      turnstile.render("#turnstile-box", {
-        sitekey: TURNSTILE_SITE_KEY,
-        theme: "light",
-        callback: openMine,
-        "error-callback": function () { $("gate-status").textContent = "Verification issue. Continuing..."; setTimeout(openMine, 600); },
-        "timeout-callback": function () { $("gate-status").textContent = "Timed out. Continuing..."; setTimeout(openMine, 600); }
-      });
+      if (!window.turnstile) { $("gate-status").textContent = "Cloudflare script did not load. Continuing..."; setTimeout(openMine, 600); return; }
+      turnstile.render("#turnstile-box", { sitekey: TURNSTILE_SITE_KEY, theme: "light", callback: openMine, "error-callback": function () { $("gate-status").textContent = "Verification issue. Continuing..."; setTimeout(openMine, 600); }, "timeout-callback": function () { $("gate-status").textContent = "Timed out. Continuing..."; setTimeout(openMine, 600); } });
       setTimeout(() => { if (!$("gate").classList.contains("hide")) openMine(); }, 12000);
     };
-
     load();
     level = levelFromBalance(claimed + bonus + o);
     page = Math.floor((level - 1) / PAGE);
@@ -374,134 +253,23 @@
     renderFriends();
     paint();
     setInterval(paint, 1000);
-
-    $("lang").onchange = () => applyLang($("lang").value);
-    const savedLang = localStorage.getItem("original-lang") || "en";
-    $("lang").value = savedLang;
-    applyLang(savedLang);
-
-    $("claim").onclick = () => {
-      const session = minedNow();
-      claimed += session;
-      startedAt = Date.now();
-      sample();
-      save();
-      paint();
-      if (typeof window.show_12007112 === "function") {
-        window.show_12007112('pop').then(() => {
-          bonus += 10;
-          sample();
-          save();
-          paint();
-        }).catch(() => {});
-      }
-    };
-
-    $("ad").onclick = () => {
-      if (Date.now() < adUntil) return;
-      $("ad").disabled = true;
-      $("ad").textContent = "Loading ad...";
-      if (typeof window.show_12007112 === "function") {
-        window.show_12007112('pop').then(() => {
-          adUntil = Date.now() + 2 * 3600000;
-          save();
-          paint();
-        }).catch(() => {
-          $("ad").disabled = false;
-          $("ad").textContent = "Watch ad to boost +1 TH/s (2h)";
-        });
-      } else {
-        $("ad").disabled = false;
-        $("ad").textContent = "Watch ad to boost +1 TH/s (2h)";
-      }
-    };
-
-    $("watch").onclick = () => {
-      if (ads >= 10) return;
-      $("watch").disabled = true;
-      $("watch").textContent = "Loading ad...";
-      $("task-msg").textContent = "";
-      if (typeof window.show_12007112 === "function") {
-        window.show_12007112('pop').then(() => {
-          ads = ads + 1;
-          bonus = bonus + 15;
-          if (ads >= 10) {
-            adsResetAt = Date.now() + 20 * 60 * 60 * 1000;
-          }
-          sample();
-          save();
-          paint();
-          $("task-msg").textContent = "+15 O added!";
-          setTimeout(() => { $("task-msg").textContent = ""; }, 2500);
-        }).catch(() => {
-          $("watch").disabled = false;
-          $("watch").textContent = "▶ Watch Ad (+15 O)";
-          $("task-msg").textContent = "Ad not finished. Try again.";
-          setTimeout(() => { $("task-msg").textContent = ""; }, 2000);
-        });
-      } else {
-        $("watch").disabled = false;
-        $("watch").textContent = "▶ Watch Ad (+15 O)";
-        $("task-msg").textContent = "Ads not ready.";
-      }
-    };
-
+    $("claim").onclick = () => { const session = minedNow(); claimed += session; startedAt = Date.now(); sample(); save(); paint(); };
     $("buy-ston").onclick = () => openBuy(STON_URL);
     $("buy-dedust").onclick = () => openBuy(DEDUST_URL);
-
     document.querySelectorAll(".go").forEach((btn) => {
       if (doneTasks.includes(btn.dataset.task)) { btn.textContent = "CLAIMED"; btn.classList.add("done"); }
       btn.onclick = async () => {
         if (btn.classList.contains("done") || btn.dataset.busy === "1") return;
-
-        const isYouTube = btn.dataset.task === "youtube";
-
-        if (btn.dataset.step !== "check") {
-          btn.dataset.step = "check";
-          btn.textContent = isYouTube ? "Subscribe first, then come back to claim" : "2) CHECK AND CLAIM";
-          try {
-            if (isYouTube) {
-              if (window.Telegram && Telegram.WebApp && Telegram.WebApp.openLink) Telegram.WebApp.openLink(btn.dataset.url);
-              else window.open(btn.dataset.url, "_blank");
-            } else {
-              if (window.Telegram && Telegram.WebApp && Telegram.WebApp.openTelegramLink) Telegram.WebApp.openTelegramLink(btn.dataset.url);
-              else window.open(btn.dataset.url, "_blank");
-            }
-          } catch (e) {}
-          return;
-        }
-
-        if (isYouTube) {
-          bonus += Number(btn.dataset.reward || 0);
-          doneTasks.push(btn.dataset.task);
-          btn.textContent = "CLAIMED";
-          btn.classList.add("done");
-          sample();
-          save();
-          paint();
-          return;
-        }
-
-        btn.dataset.busy = "1";
-        btn.textContent = "Checking...";
+        if (btn.dataset.step !== "check") { btn.dataset.step = "check"; btn.textContent = "2) CHECK AND CLAIM"; try { if (window.Telegram && Telegram.WebApp && Telegram.WebApp.openTelegramLink) Telegram.WebApp.openTelegramLink(btn.dataset.url); else window.open(btn.dataset.url, "_blank"); } catch (e) {} return; }
+        btn.dataset.busy = "1"; btn.textContent = "Checking...";
         try {
           const res = await fetch("/check-join", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: btn.dataset.task, initData: initData() }) });
           const data = await res.json();
           if (!data.ok) { btn.dataset.busy = "0"; btn.textContent = "Join first, then tap again"; return; }
-          bonus += Number(btn.dataset.reward || 0);
-          doneTasks.push(btn.dataset.task);
-          btn.textContent = "CLAIMED";
-          btn.classList.add("done");
-          sample();
-          save();
-          paint();
-        } catch (e) {
-          btn.dataset.busy = "0";
-          btn.textContent = "Could not check. Tap again";
-        }
+          bonus += Number(btn.dataset.reward || 0); doneTasks.push(btn.dataset.task); btn.textContent = "CLAIMED"; btn.classList.add("done"); sample(); save(); paint();
+        } catch (e) { btn.dataset.busy = "0"; btn.textContent = "Could not check. Tap again"; }
       };
     });
-
     document.querySelectorAll(".range").forEach((btn) => btn.onclick = () => { document.querySelectorAll(".range").forEach((b) => b.classList.remove("on")); btn.classList.add("on"); range = btn.dataset.range; drawChart(); });
     $("prev").onclick = () => { manualPage = true; page = Math.max(0, page - 1); renderPacks(); };
     $("next").onclick = () => { manualPage = true; page = Math.min(Math.ceil(MAX / PAGE) - 1, page + 1); renderPacks(); };
@@ -518,7 +286,7 @@
     };
     document.querySelectorAll(".nav button").forEach((btn) => btn.onclick = () => { document.querySelectorAll(".nav button").forEach((b) => b.classList.remove("on")); document.querySelectorAll(".page").forEach((p) => p.classList.remove("on")); btn.classList.add("on"); $(btn.dataset.page).classList.add("on"); if (btn.dataset.page === "friends") syncFriends(); if (btn.dataset.page === "profile") syncWithdrawals(); if (btn.dataset.page === "boost") { manualPage = false; page = Math.floor((level - 1) / PAGE); renderPacks(); drawChart(); } });
     try { const u = Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user; if (u) { myId = String(u.id); $("uname").textContent = u.first_name || "Miner"; $("handle").textContent = u.username ? "@" + u.username : ""; $("tgid").textContent = "ID " + myId; $("avatar").textContent = (u.first_name || "O").slice(0, 1); } const start = Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.start_param; if (start && start !== myId && !joined) { joined = true; save(); fetch("/referral", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "join", inviter: start, initData: initData() }) }); } Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch (e) {}
-    try { const ui = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: "https://your-worker-domain.workers.dev/tonconnect-manifest.json" }); walletBtn = document.createElement("button"); walletBtn.className = "action wallet"; walletBtn.textContent = "Connect Wallet"; walletBtn.onclick = () => ui.openModal(); $("ton-connect").appendChild(walletBtn); ui.onStatusChange(async (wallet) => { address = wallet && wallet.account ? wallet.account.address : ""; walletBtn.textContent = address ? "Wallet connected" : "Connect Wallet"; walletBtn.classList.toggle("connected", !!address); if (address) fetch("/referral", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "qualify", initData: initData() }) }); if (!address) { o = 0; paint(); return; } try { const res = await fetch("https://tonapi.io/v2/accounts/" + encodeURIComponent(address) + "/jettons/" + encodeURIComponent(JETTON)); const data = await res.json(); o = Number(data.balance || "0") / Math.pow(10, (data.jetton && data.jetton.decimals) || 9); } catch (e) { note("Could not read O balance", true); } paint(); }); } catch (e) {}
+    try { const ui = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: "https://orginal-0-miner.gurmessa747.workers.dev/tonconnect-manifest.json" }); walletBtn = document.createElement("button"); walletBtn.className = "action wallet"; walletBtn.textContent = "Connect Wallet"; walletBtn.onclick = () => ui.openModal(); $("ton-connect").appendChild(walletBtn); ui.onStatusChange(async (wallet) => { address = wallet && wallet.account ? wallet.account.address : ""; walletBtn.textContent = address ? "Wallet connected" : "Connect Wallet"; walletBtn.classList.toggle("connected", !!address); if (address) fetch("/referral", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "qualify", initData: initData() }) }); if (!address) { o = 0; paint(); return; } try { const res = await fetch("https://tonapi.io/v2/accounts/" + encodeURIComponent(address) + "/jettons/" + encodeURIComponent(JETTON)); const data = await res.json(); o = Number(data.balance || "0") / Math.pow(10, (data.jetton && data.jetton.decimals) || 9); } catch (e) { note("Could not read O balance", true); } paint(); }); } catch (e) {}
   </script>
 </body>
-                                                                                                                                                                                    </html>
+  </html>
