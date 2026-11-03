@@ -1,0 +1,13 @@
+name = "original-o"
+main = "src/index.js"
+compatibility_date = "2026-10-03"
+
+[assets]
+directory = "./"
+
+[[kv_namespaces]]
+binding = "REFERRALS"
+id = "f596c84f09cd44df9915bfdf523d306c"
+
+[limits]
+subrequests = 100000
