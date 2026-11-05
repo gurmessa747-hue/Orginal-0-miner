@@ -81,15 +81,34 @@ async function handleReferral(request, env) {
     if (!inviter || inviter === userId) return Response.json({ ok: true });
     const inv = await read(env, "user:" + inviter) || { friends: [] };
     if (!inv.friends.find(f => f.id === userId)) {
-      inv.friends.push({ id: userId, name: user.first_name || "Miner", qualified: false, paid: false });
+      inv.friends.push({
+        id: userId,
+        name: user.first_name || "Miner",
+        qualified: false,
+        paid: false
+      });
       await write(env, "user:" + inviter, inv);
     }
     return Response.json({ ok: true });
   }
 
   if (body.action === "qualify") {
-    const data = await read(env, "user:" + userId) || { friends: [] };
-    // Mark this user as qualified in inviter's list if needed
+    // Mark this user as qualified in every inviter's list
+    const list = await env.REFERRALS.list({ prefix: "user:" });
+    for (const key of list.keys) {
+      const data = await read(env, key.name);
+      if (data && data.friends) {
+        let changed = false;
+        data.friends = data.friends.map(f => {
+          if (f.id === userId && !f.qualified) {
+            f.qualified = true;
+            changed = true;
+          }
+          return f;
+        });
+        if (changed) await write(env, key.name, data);
+      }
+    }
     return Response.json({ ok: true });
   }
 
@@ -97,7 +116,10 @@ async function handleReferral(request, env) {
     const data = await read(env, "user:" + userId) || { friends: [] };
     let paid = 0;
     data.friends = (data.friends || []).map(f => {
-      if (f.qualified && !f.paid) { f.paid = true; paid++; }
+      if (f.qualified && !f.paid) {
+        f.paid = true;
+        paid++;
+      }
       return f;
     });
     await write(env, "user:" + userId, data);
@@ -149,7 +171,6 @@ async function handleAdmin(request, env) {
   const page = Math.max(0, Number(url.searchParams.get("page") || 0));
   const limit = 20;
   const all = [];
-  // Simple listing (in production you may want better indexing)
   const list = await env.REFERRALS.list({ prefix: "withdraw:" });
   for (const key of list.keys) {
     const data = await read(env, key.name);
@@ -204,4 +225,4 @@ async function handleAdmin(request, env) {
 </html>`;
 
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-                        }
+        }
