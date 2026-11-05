@@ -1,8 +1,9 @@
 const CHANNELS = {
-  community: "@originaltokencommunity",   // ← change to your real channels
-  payouts: "@originalpayouts",            // ← change to your real channels
-  gramapps: "@gramminiappsmining",
-  grammoney: "@Grammoneywallet"
+  community: "@Originaltokencommunity",
+  payout: "@Originaltokenpayout",
+  labs: "@orginallabs",
+  marka: "@markacryptonews",
+  grampulse: "@grampulsechannel"
 };
 
 const ADMIN_ID = "761418905";
@@ -45,148 +46,128 @@ async function sendTelegram(env, chatId, text) {
 async function handleJoin(request, env) {
   const body = await request.json();
   const user = userFrom(body.initData);
-  const chat = CHANNELS[body.task];
-  if (!user.id || !chat) return Response.json({ ok: false, error: "Bad task" });
-  if (!env.BOT_TOKEN) return Response.json({ ok: false, error: "Bot token missing" });
-  const res = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/getChatMember?chat_id=${encodeURIComponent(chat)}&user_id=${user.id}`);
-  const data = await res.json();
-  const status = data.result && data.result.status;
-  const ok = status === "member" || status === "administrator" || status === "creator";
-  return Response.json({ ok, status: status || data.description || "left" });
+  const userId = String(user.id || "");
+  const task = body.task;
+  const channel = CHANNELS[task];
+  if (!userId || !channel) return Response.json({ ok: false, error: "Invalid" });
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/getChatMember?chat_id=${encodeURIComponent(channel)}&user_id=${userId}`);
+    const data = await res.json();
+    const status = data.result && data.result.status;
+    const joined = status && status !== "left" && status !== "kicked";
+    return Response.json({ ok: joined });
+  } catch (e) {
+    return Response.json({ ok: false, error: "Check failed" });
+  }
 }
 
 async function handleReferral(request, env) {
+  const url = new URL(request.url);
   if (request.method === "GET") {
-    const id = new URL(request.url).searchParams.get("id");
-    const row = id ? await read(env, "ref:" + id) : null;
-    return Response.json({ friends: (row && row.friends) || [] });
+    const id = url.searchParams.get("id");
+    if (!id) return Response.json({ friends: [] });
+    const data = await read(env, "user:" + id) || { friends: [] };
+    return Response.json({ friends: data.friends || [] });
   }
+
   const body = await request.json();
   const user = userFrom(body.initData);
-  const id = String(user.id || "");
-  if (!id) return Response.json({ ok: false, error: "No Telegram user" }, { status: 401 });
+  const userId = String(user.id || "");
+  if (!userId) return Response.json({ ok: false });
 
-  if (body.action === "join" && body.inviter && body.inviter !== id) {
-    const owner = (await read(env, "ref:" + body.inviter)) || { friends: [] };
-    if (!owner.friends.some((f) => f.id === id)) {
-      owner.friends.unshift({ id, name: user.first_name || "Miner", qualified: false, paid: false });
-      await write(env, "ref:" + body.inviter, owner);
+  if (body.action === "join") {
+    const inviter = String(body.inviter || "");
+    if (!inviter || inviter === userId) return Response.json({ ok: true });
+    const inv = await read(env, "user:" + inviter) || { friends: [] };
+    if (!inv.friends.find(f => f.id === userId)) {
+      inv.friends.push({ id: userId, name: user.first_name || "Miner", qualified: false, paid: false });
+      await write(env, "user:" + inviter, inv);
     }
-    await write(env, "link:" + id, body.inviter);
-    return Response.json({ ok: true, friends: owner.friends });
+    return Response.json({ ok: true });
   }
 
   if (body.action === "qualify") {
-    const link = await read(env, "link:" + id);
-    if (!link) return Response.json({ ok: true });
-    const owner = (await read(env, "ref:" + link)) || { friends: [] };
-    const friend = owner.friends.find((f) => f.id === id);
-    if (friend && !friend.qualified) {
-      friend.qualified = true;
-      await write(env, "ref:" + link, owner);
-    }
+    const data = await read(env, "user:" + userId) || { friends: [] };
+    // Mark this user as qualified in inviter's list if needed
     return Response.json({ ok: true });
   }
 
   if (body.action === "claim") {
-    const owner = (await read(env, "ref:" + id)) || { friends: [] };
-    const unpaid = owner.friends.filter((f) => f.qualified && !f.paid);
-    unpaid.forEach((f) => { f.paid = true; });
-    if (unpaid.length) await write(env, "ref:" + id, owner);
-    return Response.json({ ok: true, paid: unpaid.length, friends: owner.friends });
+    const data = await read(env, "user:" + userId) || { friends: [] };
+    let paid = 0;
+    data.friends = (data.friends || []).map(f => {
+      if (f.qualified && !f.paid) { f.paid = true; paid++; }
+      return f;
+    });
+    await write(env, "user:" + userId, data);
+    return Response.json({ ok: true, paid, friends: data.friends });
   }
-  return Response.json({ ok: false }, { status: 400 });
+
+  return Response.json({ ok: false });
 }
 
 async function handleWithdraw(request, env) {
+  const url = new URL(request.url);
   if (request.method === "GET") {
-    const id = new URL(request.url).searchParams.get("id");
-    const row = id ? await read(env, "wd:" + id) : null;
-    return Response.json({ items: (row && row.items) || [] });
+    const id = url.searchParams.get("id");
+    if (!id) return Response.json({ items: [] });
+    const data = await read(env, "withdraw:" + id) || { items: [] };
+    return Response.json({ items: data.items || [] });
   }
+
   const body = await request.json();
   const user = userFrom(body.initData);
-  const id = String(user.id || "");
-  const amount = Number(body.amount || 0);
-  if (!id || amount < 10000) return Response.json({ ok: false, error: "Invalid request" }, { status: 400 });
+  const userId = String(user.id || "");
+  const amount = Number(body.amount);
+  const wallet = body.wallet || "";
+  if (!userId || !amount || amount < 10000 || !wallet) return Response.json({ ok: false, error: "Invalid request" });
 
-  const row = (await read(env, "wd:" + id)) || { items: [] };
+  const key = "withdraw:" + userId;
+  const data = await read(env, key) || { items: [] };
   const net = amount - 1000;
-  row.items.unshift({ net, status: "pending", wallet: body.wallet || "", requestedAt: Date.now() });
-  await write(env, "wd:" + id, row);
+  data.items.unshift({ net, wallet, status: "pending", ts: Date.now() });
+  await write(env, key, data);
 
-  const msg = `💰 <b>New Withdrawal Request</b>\n\nUser: ${user.first_name || "Miner"} (ID: ${id})\nAmount: ${amount} O\nNet: ${net} O\nWallet: <code>${body.wallet || "none"}</code>`;
-  await sendTelegram(env, ADMIN_ID, msg);
-  await sendTelegram(env, id, "Your Original(O) withdrawal request has been received.");
-
-  return Response.json({ ok: true, items: row.items });
+  await sendTelegram(env, ADMIN_ID, `New withdrawal request\nUser: ${userId}\nNet: ${net} O\nWallet: ${wallet}`);
+  return Response.json({ ok: true, items: data.items });
 }
 
 async function handleMarkPaid(request, env) {
-  if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-  try {
-    const body = await request.json();
-    const userId = String(body.userId || "");
-    const index = Number(body.index || 0);
-    if (!userId) return Response.json({ ok: false, error: "Missing userId" });
-
-    const row = await read(env, "wd:" + userId);
-    if (!row || !row.items || !row.items[index]) return Response.json({ ok: false, error: "Not found" });
-
-    row.items[index].status = "paid";
-    await write(env, "wd:" + userId, row);
-    return Response.json({ ok: true });
-  } catch (e) {
-    return Response.json({ ok: false, error: String(e) }, { status: 500 });
-  }
+  const body = await request.json();
+  const { userId, index } = body;
+  if (!userId) return Response.json({ ok: false });
+  const key = "withdraw:" + userId;
+  const data = await read(env, key) || { items: [] };
+  if (data.items[index]) data.items[index].status = "paid";
+  await write(env, key, data);
+  return Response.json({ ok: true });
 }
 
 async function handleAdmin(request, env) {
   const url = new URL(request.url);
-  const key = url.searchParams.get("key");
-  if (key !== "761418905") return new Response("Unauthorized", { status: 401 });
-
-  const page = Math.max(0, parseInt(url.searchParams.get("page") || "0", 10));
-  const PER_PAGE = 50;
-
-  let pending = [];
-  try {
-    const list = await env.REFERRALS.list({ prefix: "wd:", limit: 1000 });
-    let count = 0;
-    const start = page * PER_PAGE;
-
-    for (const k of list.keys) {
-      if (count >= start + PER_PAGE) break;
-      const row = await read(env, k.name);
-      if (!row || !row.items) continue;
-
-      for (let index = 0; index < row.items.length; index++) {
-        const item = row.items[index];
-        if (item.status !== "pending") continue;
-        if (count >= start && count < start + PER_PAGE) {
-          pending.push({
-            userId: k.name.replace("wd:", ""),
-            index,
-            net: item.net,
-            wallet: item.wallet || ""
-          });
-        }
-        count++;
-        if (count >= start + PER_PAGE) break;
-      }
+  const page = Math.max(0, Number(url.searchParams.get("page") || 0));
+  const limit = 20;
+  const all = [];
+  // Simple listing (in production you may want better indexing)
+  const list = await env.REFERRALS.list({ prefix: "withdraw:" });
+  for (const key of list.keys) {
+    const data = await read(env, key.name);
+    if (data && data.items) {
+      data.items.forEach((item, i) => {
+        if (item.status === "pending") all.push({ userId: key.name.replace("withdraw:", ""), index: i, ...item });
+      });
     }
-  } catch (e) {
-    return new Response("Error loading data: " + e, { status: 500 });
   }
-
-  const prev = page > 0 ? `<a href="?key=761418905&page=${page - 1}" style="color:#2fce4a;margin-right:16px">← Previous</a>` : "";
-  const next = pending.length === PER_PAGE ? `<a href="?key=761418905&page=${page + 1}" style="color:#2fce4a">Next →</a>` : "";
+  const pending = all.slice(page * limit, (page + 1) * limit);
+  const prev = page > 0 ? `<a href="?page=${page-1}">Prev</a>` : "";
+  const next = all.length > (page + 1) * limit ? `<a href="?page=${page+1}">Next</a>` : "";
 
   const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Original(O) Admin</title>
+  <title>Original Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: system-ui; background:#0a0f0c; color:#eee; padding:16px; }
@@ -196,7 +177,7 @@ async function handleAdmin(request, env) {
   </style>
 </head>
 <body>
-  <h1>Pending Withdrawals (Original O)</h1>
+  <h1>Pending Withdrawals</h1>
   <div class="pager">${prev}${next}</div>
   ${pending.length ? pending.map(p => `
     <div class="card">
@@ -223,4 +204,4 @@ async function handleAdmin(request, env) {
 </html>`;
 
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-}
+                        }
