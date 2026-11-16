@@ -26,6 +26,7 @@ export default {
     if (url.pathname === "/claim") return handleClaim(request, env);
     if (url.pathname === "/boost") return handleBoost(request, env);
     if (url.pathname === "/ad-reward") return handleAdReward(request, env);
+    if (url.pathname === "/migrate") return handleMigrate(request, env);
     return env.ASSETS.fetch(request);
   }
 };
@@ -91,6 +92,44 @@ function defaultUser() {
     adTaskReset: 0,
     doneTasks: []
   };
+}
+
+async function handleMigrate(request, env) {
+  const body = await request.json();
+  const user = userFrom(body.initData);
+  const userId = String(user.id || "");
+  if (!userId) return Response.json({ ok: false });
+
+  const key = "user:" + userId;
+  const existing = await read(env, key);
+
+  if (existing && (existing.claimed || 0) + (existing.bonus || 0) > 1) {
+    return Response.json({ ok: true, migrated: false, reason: "already has balance" });
+  }
+
+  const claimed = Math.max(0, Number(body.claimed) || 0);
+  const bonus = Math.max(0, Number(body.bonus) || 0);
+  const startedAt = Number(body.startedAt) || Date.now();
+  const boostEnd = Number(body.boostEnd) || 0;
+  const adTaskCount = Math.min(10, Math.max(0, Number(body.adTaskCount) || 0));
+  const adTaskReset = Number(body.adTaskReset) || 0;
+  const doneTasks = Array.isArray(body.doneTasks) ? body.doneTasks : [];
+
+  if (claimed + bonus > 50000000) {
+    return Response.json({ ok: false, error: "Amount too high" });
+  }
+
+  const data = existing || defaultUser();
+  data.claimed = claimed;
+  data.bonus = bonus;
+  data.startedAt = startedAt;
+  data.boostEnd = boostEnd;
+  data.adTaskCount = adTaskCount;
+  data.adTaskReset = adTaskReset;
+  data.doneTasks = doneTasks;
+
+  await write(env, key, data);
+  return Response.json({ ok: true, migrated: true, claimed, bonus });
 }
 
 async function handleState(request, env) {
@@ -215,7 +254,6 @@ async function handleReferral(request, env) {
       });
       await write(env, "user:" + inviter, inv);
     }
-    // Store inviter on referred user for fast qualify
     const referred = await read(env, "user:" + userId) || defaultUser();
     if (!referred.inviter) {
       referred.inviter = inviter;
@@ -284,7 +322,6 @@ async function handleWithdraw(request, env) {
   const balance = u.claimed + u.bonus;
   if (balance < amount) return Response.json({ ok: false, error: "Insufficient balance" });
 
-  // Deduct
   if (u.bonus >= amount) u.bonus -= amount;
   else {
     u.claimed -= (amount - u.bonus);
@@ -372,4 +409,4 @@ async function handleAdmin(request, env) {
 </html>`;
 
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-                        }
+    }
